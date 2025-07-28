@@ -1,0 +1,25 @@
+﻿using Application.Features.Mediator.Commands.WeatherDataCommands;
+using Application.Features.Mediator.Results.WeatherDataResults;
+using AutoMapper;
+using Domain.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Application.Mapping
+{
+    public class MapperProfile : Profile
+    {
+        public MapperProfile()
+        {
+            CreateMap<WeatherData, GetWeatherDataByIdQueryResult>().ReverseMap();
+            CreateMap<WeatherData, GetAllWeatherDataQueryResult>().ReverseMap();
+            CreateMap<WeatherData, CreateWeatherDataCommand>().ReverseMap();
+            CreateMap<WeatherData, UpdateWeatherDataCommand>().ReverseMap();
+            CreateMap<WeatherData, RemoveWeatherDataCommand>().ReverseMap();
+         
+        }
+    }
+}
