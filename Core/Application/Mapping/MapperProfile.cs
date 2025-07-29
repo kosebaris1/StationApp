@@ -1,4 +1,6 @@
-﻿using Application.Features.Mediator.Commands.WeatherDataCommands;
+﻿using Application.Features.Mediator.Commands.UserCommands;
+using Application.Features.Mediator.Commands.WeatherDataCommands;
+using Application.Features.Mediator.Results.AdminResults;
 using Application.Features.Mediator.Results.WeatherDataResults;
 using AutoMapper;
 using Domain.Entities;
@@ -19,7 +21,12 @@ namespace Application.Mapping
             CreateMap<WeatherData, CreateWeatherDataCommand>().ReverseMap();
             CreateMap<WeatherData, UpdateWeatherDataCommand>().ReverseMap();
             CreateMap<WeatherData, RemoveWeatherDataCommand>().ReverseMap();
-         
+
+
+            CreateMap<User, CreateUserCommand>().ReverseMap();
+            CreateMap<User, GetAllUserByIsApprovedQueryResult>()
+            .ForMember(dest => dest.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate));
+
         }
     }
 }
