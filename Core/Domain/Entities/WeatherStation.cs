@@ -12,7 +12,6 @@ namespace Domain.Entities
         public string StationName { get; set; }
         public string Indicator { get; set; } // örn: "Hava Kalitesi", "Nem Ölçer" gibi
         public string Location { get; set; }
-
         public ICollection<WeatherData> WeatherDataEntries { get; set; }
     }
 

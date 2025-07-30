@@ -28,6 +28,7 @@ namespace Persistence.Repository
            
         }
 
+
         public async Task<User?> GetUserWithRoleAsync(string email, string password)
         {
             return await _context.Users

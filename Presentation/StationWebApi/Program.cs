@@ -1,10 +1,12 @@
 using Application.Interfaces;
 using Application.Interfaces.JwtService;
+using Application.Interfaces.WeatherStationInterface;
 using Application.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Persistence.Context;
 using Persistence.Repository;
+using Persistence.Repository.WeatherStationRepositories;
 using Persistence.Service;
 using Persistence.Settings;
 using System.Text;
@@ -24,6 +26,7 @@ namespace StationWebApi
 
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IWeatherStationRepository, WeatherStationRepository>();
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
