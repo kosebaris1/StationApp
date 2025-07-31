@@ -36,5 +36,6 @@ namespace Persistence.Repository.WeatherStationRepositories
             return result;
         }
 
+       
     }
 }

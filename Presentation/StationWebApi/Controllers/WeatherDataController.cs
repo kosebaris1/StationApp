@@ -54,7 +54,7 @@ namespace StationWebApi.Controllers
             await _mediator.Send(command);
             return Ok("WeatherData başarıyla Güncellendi");
         }
-
+        
         [HttpDelete]
         public async Task<IActionResult> RemoveWeatherData(int id)
         {
