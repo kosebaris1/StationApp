@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Features.Mediator.Handlers.WeatherStationHandlers
+namespace Application.Features.Mediator.Handlers.WeatherStationHandlers.Read
 {
     public class GetAllWeatherStationsWithLastDataQueryHandler : IRequestHandler<GetAllWeatherStationsWithLastDataQuery, List<GetAllWeatherStationsWithLastDataQueryResult>>
     {

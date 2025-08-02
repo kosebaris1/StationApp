@@ -24,10 +24,10 @@ namespace StationWebApi.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("GetAllWeatherDataByStationId")]
         public async Task<IActionResult> GetWeatherDataById(int id)
         {
-            var result = await _mediator.Send(new GetWeatherDataByIdQuery(id));
+            var result = await _mediator.Send(new GetWeatherDataByWeatherStationIdQuery(id));
             return Ok(result);
         }
 

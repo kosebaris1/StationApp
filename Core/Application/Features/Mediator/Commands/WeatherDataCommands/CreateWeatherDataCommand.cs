@@ -16,6 +16,9 @@ namespace Application.Features.Mediator.Commands.WeatherDataCommands
         public double Temperature { get; set; }  // Sıcaklık
         public double Humidity { get; set; }     // Nem
         public double WindSpeed { get; set; }    // Rüzgar Hızı
+        public string WindDirection { get; set; }    // Rüzgar yönü
+        public double pressure { get; set; }    // Basınç
+
         public string Description { get; set; }  // "Rüzgarlı", "Sisli" vb.
     }
 }

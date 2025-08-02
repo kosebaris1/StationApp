@@ -18,7 +18,7 @@ namespace Application.Mapping
     {
         public MapperProfile()
         {
-            CreateMap<WeatherData, GetWeatherDataByIdQueryResult>().ReverseMap();
+            CreateMap<WeatherData, GetWeatherDataByWeatherStationIdQueryResult>().ReverseMap();
             CreateMap<WeatherData, GetAllWeatherDataQueryResult>().ReverseMap();
             CreateMap<WeatherData, CreateWeatherDataCommand>().ReverseMap();
             CreateMap<WeatherData, UpdateWeatherDataCommand>().ReverseMap();

@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace Application.Features.Mediator.Queries.WeatherDataQueries
 {
-    public class GetWeatherDataByIdQuery : IRequest<GetWeatherDataByIdQueryResult>
+    public class GetWeatherDataByWeatherStationIdQuery : IRequest<List<GetWeatherDataByWeatherStationIdQueryResult>>
     {
         public int Id { get; set; }
 
-        public GetWeatherDataByIdQuery(int id)
+        public GetWeatherDataByWeatherStationIdQuery(int id)
         {
             Id = id;
         }
