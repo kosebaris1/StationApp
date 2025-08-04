@@ -1,20 +1,26 @@
 using Application.Interfaces;
+using Application.Interfaces.EventPublisherInterface;
 using Application.Interfaces.JwtService;
 using Application.Interfaces.SignalRInterface;
 using Application.Interfaces.WeatherDataInterface;
 using Application.Interfaces.WeatherStationInterface;
 using Application.Services;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Persistence.Broadcasters;
 using Persistence.Context;
 using Persistence.Hubs;
+using Persistence.Messaging;
 using Persistence.Repository;
 using Persistence.Repository.WeatherDataRepository;
 using Persistence.Repository.WeatherStationRepositories;
 using Persistence.Service;
 using Persistence.Settings;
+using StationWebApi.Configurations;
+using StationWebApi.Consumers;
 using System.Text;
 
 namespace StationWebApi
@@ -29,7 +35,31 @@ namespace StationWebApi
             builder.Services.AddApplicationService(builder.Configuration);
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Station API", Version = "v1" });
+
+                var jwtSecurityScheme = new OpenApiSecurityScheme
+                {
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Description = "Put **_ONLY_** your JWT Bearer token below!",
+                    Reference = new OpenApiReference
+                    {
+                        Id = JwtBearerDefaults.AuthenticationScheme,
+                        Type = ReferenceType.SecurityScheme
+                    }
+                };
+
+                c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        { jwtSecurityScheme, Array.Empty<string>() }
+    });
+            });
 
             // DI
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -37,12 +67,41 @@ namespace StationWebApi
             builder.Services.AddScoped<IWeatherStationRepository, WeatherStationRepository>();
             builder.Services.AddScoped<IWeatherDataBroadcaster, WeatherDataBroadcaster>();
             builder.Services.AddScoped<IWeatherDataRepository, WeatherDataRepository>();
+            builder.Services.AddScoped<IEventPublisher, MassTransitEventPublisher>();
+
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
             builder.Services.AddScoped<IJwtService, JwtService>();
+
+            builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
+            builder.Services.AddScoped<IEventPublisher, MassTransitEventPublisher>();
+            builder.Services.AddMassTransit(x =>
+            {
+                x.AddConsumer<UserApprovedEventConsumer>();
+                x.AddConsumer<UserRejectedEventConsumer>();
+
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Host("localhost", "/", h =>
+                    {
+                        h.Username("guest");
+                        h.Password("guest");
+                    });
+
+                    cfg.ReceiveEndpoint("user-approved-event-queue", e =>
+                    {
+                        e.ConfigureConsumer<UserApprovedEventConsumer>(context);
+                    });
+
+                    cfg.ReceiveEndpoint("user-rejected-event-queue", e =>
+                    {
+                        e.ConfigureConsumer<UserRejectedEventConsumer>(context);
+                    });
+                });
+            });
 
             builder.Services.AddAuthentication("Bearer")
                 .AddJwtBearer("Bearer", options =>
@@ -88,7 +147,10 @@ namespace StationWebApi
             {
                 options.AddPolicy("AllowFrontend", policy =>
                 {
-                    policy.WithOrigins("http://localhost:3000")
+                    policy.WithOrigins(
+                        "http://localhost:3000",
+                        "http://127.0.0.1:3000"
+                        ) //  "http://127.0.0.1:5500"
                           .AllowAnyHeader()
                           .AllowAnyMethod()
                           .AllowCredentials(); 
@@ -107,6 +169,7 @@ namespace StationWebApi
 
             app.UseHttpsRedirection();
             app.UseCors("AllowFrontend");
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();

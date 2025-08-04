@@ -1,6 +1,7 @@
 ﻿using Application.Features.Mediator.Commands.AdminCommands;
 using Application.Features.Mediator.Queries.AdminQueries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +9,7 @@ namespace StationWebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "admin")]
     public class AdminController : ControllerBase
     {
         private readonly IMediator _mediator;

@@ -24,7 +24,7 @@ namespace StationWebApi.Controllers
             return Ok("İstasyon ve hava verisi başarıyla eklendi.");
         }
 
-        [HttpGet("GetAllWithLastData")]
+        [HttpGet("GetAllWeatherStationWithLastData")]
         public async Task<IActionResult> GetAllWithLastData()
         {
             var result = await _mediator.Send(new GetAllWeatherStationsWithLastDataQuery());

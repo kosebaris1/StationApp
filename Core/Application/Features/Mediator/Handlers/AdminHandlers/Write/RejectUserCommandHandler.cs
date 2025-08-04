@@ -1,5 +1,7 @@
-﻿using Application.Features.Mediator.Commands.AdminCommands;
+﻿using Application.Events;
+using Application.Features.Mediator.Commands.AdminCommands;
 using Application.Interfaces;
+using Application.Interfaces.EventPublisherInterface;
 using Domain.Entities;
 using MediatR;
 using System;
@@ -13,10 +15,11 @@ namespace Application.Features.Mediator.Handlers.AdminHandlers.Write
     public class RejectUserCommandHandler : IRequestHandler<RejectUserCommand>
     {
         private readonly IRepository<User> _repository;
-
-        public RejectUserCommandHandler(IRepository<User> repository)
+        private readonly IEventPublisher _eventPublisher;
+        public RejectUserCommandHandler(IRepository<User> repository, IEventPublisher eventPublisher)
         {
             _repository = repository;
+            _eventPublisher = eventPublisher;
         }
 
         public async Task Handle(RejectUserCommand request, CancellationToken cancellationToken)
@@ -25,7 +28,14 @@ namespace Application.Features.Mediator.Handlers.AdminHandlers.Write
             {
                 var user = await _repository.GetByIdAsync(request.UserId);
                 user.DeletedDate = DateTime.Now;
+                user.IsApproved = false;
                 await _repository.UpdateAsync(user);
+
+                await _eventPublisher.PublishUserRejectedAsync(new UserRejectedEvent
+                {
+                    Email = user.Email,
+                    FullName = user.FullName
+                });
             }
             catch (Exception ex)
             {
